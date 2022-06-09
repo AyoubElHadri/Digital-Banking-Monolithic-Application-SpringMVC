@@ -12,6 +12,8 @@ import com.example.digitalbank.repositories.BankAccountRepository;
 import com.example.digitalbank.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -173,5 +175,21 @@ public class BankAcountServiceImpl implements BankAccountService{
     public List<AccountOperationDto> accountHistory(String accountId) {
         List<AccountOperations> operations = operationsRepository.findByBankAccountId(accountId);
         return operations.stream().map(op->mapper.fromAccountOperation(op)).collect(Collectors.toList());
+    }
+
+    @Override
+    public AccountHistoryDto getAccountHistory(String accountId, int page, int size) throws BankAccountNotFoundException {
+        BankAccount bankAccount = bankAccountRepository.findById(accountId).orElse(null);
+        if(bankAccount ==null) throw new BankAccountNotFoundException("Account not found");
+        Page<AccountOperations> accountOperations = operationsRepository.findByBankAccountId(accountId, PageRequest.of(page,size));
+        AccountHistoryDto accountHistoryDto = new AccountHistoryDto();
+        List<AccountOperationDto> accountOperationDtos =accountOperations.getContent().stream().map(op-> mapper.fromAccountOperation(op)).collect(Collectors.toList());
+        accountHistoryDto.setAccountOperationDtos(accountOperationDtos);
+        accountHistoryDto.setAccountId(bankAccount.getId());
+        accountHistoryDto.setBalance(bankAccount.getBalance());
+        accountHistoryDto.setCurrentPage(page);
+        accountHistoryDto.setPageSize(size);
+        accountHistoryDto.setTotalPages(accountOperations.getTotalPages());
+        return accountHistoryDto;
     }
 }
