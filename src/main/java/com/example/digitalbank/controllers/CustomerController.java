@@ -20,6 +20,10 @@ public class CustomerController {
     public CustomerDto getCustomer(@PathVariable(name = "id") Long customerId) throws CustomerNotFoundException {
         return bankAccountService.getCustomer(customerId);
     }
+    @GetMapping("/customers")
+    public List<CustomerDto> listCustomers() throws CustomerNotFoundException {
+        return bankAccountService.listCustomers();
+    }
 
 
     @PostMapping("/customers")
