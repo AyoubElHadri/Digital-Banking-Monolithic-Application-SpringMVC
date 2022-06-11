@@ -32,7 +32,7 @@ public class BankAccountController {
     }
 
     @GetMapping("/accounts/{id}/pageOperations")
-    public AccountHistoryDto getAcountHistory(
+    public AccountHistoryDto getAccountHistory(
             @PathVariable(name = "id") String accountId,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size) throws BankAccountNotFoundException {
